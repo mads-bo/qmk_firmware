@@ -19,7 +19,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_0,
         KC_SCLN, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_P,    KC_ENT,
         KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_MINS, KC_RSFT,
-        KC_RCTL, KC_LWIN, KC_0,    KC_0,    MO(1),   KC_SPC,  KC_1,    KC_0,    KC_0,    KC_0,    KC_0,    QK_BOOT
+        KC_RCTL, KC_LWIN, KC_0,    KC_0,    MO(1),   KC_SPC,  RGB_MOD, KC_0,    KC_0,    KC_0,    KC_0,    QK_BOOT
     ),
     [1] = LAYOUT_ortho_5x12(
         KC_0,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
@@ -41,10 +41,9 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 }
             } else if (index == 1) {
                 if (clockwise) {
-                    tap_code(KC_PGDN);
+                    rgblight_increase_val();
                 } else {
-                    tap_code(KC_PGUP);
-
+                    rgblight_decrease_val();
                 }
             }
             break;
@@ -57,11 +56,24 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 }
             } else if (index == 1) {
                 if (clockwise) {
-                    tap_code_delay(KC_VOLU, 10);
+                    rgblight_increase_hue();
                 } else {
-                    tap_code_delay(KC_VOLD, 10);
+                    rgblight_decrease_hue();
                 }
             }
+            break;
+    }
+    return false;
+}
+
+bool oled_task_user(void) {
+    oled_write_P(PSTR("Layer: "), false);
+    switch(get_highest_layer(layer_state|default_layer_state)) {
+        case 0:
+            oled_write_P(PSTR("Default\n"), false);
+            break;
+        case 1:
+            oled_write_P(PSTR("Fn1\n"), false);
             break;
     }
     return false;
